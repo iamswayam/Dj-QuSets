@@ -74,20 +74,20 @@ class EmployeeSerializer(WritableNestedModelSerializer, BaseSerailizer):
     """
     EmployeeSerializer
     """
-    fName = serializers.CharField()
-    mName = serializers.CharField(allow_blank=True)
-    lName = serializers.CharField(allow_blank=True)
+    first_name = serializers.CharField(source="fName")
+    middle_name = serializers.CharField(source="mName", allow_blank=True)
+    last_name = serializers.CharField(source="lName", allow_blank=True)
     age = serializers.IntegerField()
-    company = serializers.CharField(source='company.name')
-    library = LibrarySerializer(source="library.name", many=True)
+    company = serializers.CharField()
+    library = LibrarySerializer(many=True)
 
     class Meta:
         model= Employee
         fields = [
           "id",
-          "fName",
-          "mName",
-          "lName",
+          "first_name",
+          "middle_name",
+          "last_name",
           "age",
           "company",
           "library",

@@ -11,11 +11,13 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+
 class Author(models.Model):
     name = models.CharField(max_length=60)
 
     def __str__(self):
         return self.name
+
 
 class Book(models.Model):
     name = models.CharField(max_length=60)
@@ -31,6 +33,7 @@ class Book(models.Model):
         else:
             return f"{self.name} - {self.author}"
 
+
 class Library(models.Model):
     name = models.CharField(max_length=60)
     book = models.ManyToManyField(
@@ -44,7 +47,12 @@ class Library(models.Model):
     def __str__(self):
         return self.name
 
+
 class Employee(models.Model):
+    """
+    Employee details.
+    """
+
     fName = models.CharField("first name", max_length=50)
     mName = models.CharField("middle name", max_length=50, blank=True)
     lName = models.CharField("last name", max_length=50, blank=True)
@@ -61,12 +69,25 @@ class Employee(models.Model):
         related_name="employees",
         through="EmployeeMembership",
     )
+    membership = models.BooleanField(
+        default=False,
+    )
+    idCard_pic = models.ImageField(
+        "ID card image",
+        upload_to=None, 
+        height_field=None, 
+        width_field=None, 
+        max_length=100,
+        blank=True,
+    )
 
     def get_full_name(self):
+        verbose_name = "Full Name"
         return f"{self.fName} {self.mName} {self.lName}"
-
+    
     def __str__(self):
         return f"{self.get_full_name()} - {self.company}"
+
 
 class EmployeeMembership(models.Model):
     id = models.UUIDField(
