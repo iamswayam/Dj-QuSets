@@ -1,9 +1,32 @@
 {% block content %}
   <div>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <h1>
-      {% for employee in employees %}
-        Hey, {{employee.get_full_name}}({{employee.age}})
-      {% endfor %}
-    </h1>
-  </div>
+      <title>Book Information</title>
+        <style>
+        table, th, tr, td {
+        border: 1px solid black
+        }
+        </style>
+    </head>
+
+  <body>
+  <table>
+    <h3>Books Information</h3>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Author</th>
+        {% for book in books %}
+          <tr>
+            <td>{{book.id}}</td>
+            <td>{{book.name}}</td>
+            <td>{{book.author}}</td>
+          </tr>
+        {% endfor %}
+    </table> 
+  </body>
+
 {% endblock content %}
+

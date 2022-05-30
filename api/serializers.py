@@ -70,6 +70,7 @@ class LibrarySerializer(BaseSerailizer):
           "employees",
         ]
 
+
 class EmployeeSerializer(WritableNestedModelSerializer, BaseSerailizer):
     """
     EmployeeSerializer
@@ -80,6 +81,7 @@ class EmployeeSerializer(WritableNestedModelSerializer, BaseSerailizer):
     age = serializers.IntegerField()
     company = serializers.CharField()
     library = LibrarySerializer(many=True)
+    membership = serializers.BooleanField()
 
     class Meta:
         model= Employee
@@ -91,7 +93,9 @@ class EmployeeSerializer(WritableNestedModelSerializer, BaseSerailizer):
           "age",
           "company",
           "library",
+          "membership",
         ]
+
 
 class CompanySerializer(BaseSerailizer):
     """
@@ -104,6 +108,21 @@ class CompanySerializer(BaseSerailizer):
         fields = [
           "name", 
           "employees",
+        ]
+
+
+class EmployeeMembershipSerializer(BaseSerailizer):
+    """
+    CompanySerializer
+    """
+    employee = serializers.CharField()
+    validity = serializers.DateField(source="expiry_date", read_only=True)
+
+    class Meta:
+        model= Company
+        fields = [
+          "employee", 
+          "validity",
         ]
 
 

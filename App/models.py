@@ -1,6 +1,5 @@
 from django.db import models
-import uuid
-
+import datetime
 
 class Company(models.Model):
     name = models.CharField(max_length=100)
@@ -43,6 +42,15 @@ class Library(models.Model):
     
     class Meta: 
         verbose_name_plural = "libraries"
+
+    def get_books(self):
+        return ", ".join([b.name for b in self.book.all()])
+
+    def get_authors(self):
+        return ", ".join([b.author.name for b in self.book.all()])
+
+    def get_books_with_author(self):
+        return ", ".join(f"{b.name} ({b.author})"for b in self.book.all())
 
     def __str__(self):
         return self.name
@@ -89,22 +97,55 @@ class Employee(models.Model):
         return f"{self.get_full_name()} - {self.company}"
 
 
+class MembershipDuration(models.TextChoices):
+    """
+    Enumerated choices for the membership duration.
+    """
+
+    ONE_MONTH = 30, "30 Days - 1 Month"
+    THREE_MONTH = 90, "90 Days - 3 months"
+    SIX_MONTH = 180, "180 Days - 6 months"
+    ONE_YEAR = 365, "365 Days - 1 Year"
+
+
 class EmployeeMembership(models.Model):
-    id = models.UUIDField(
-        primary_key=True, 
-        default=uuid.uuid4, 
-        editable=True,
-    )
-    employee = models.ForeignKey(
+
+    employee = models.OneToOneField(
         Employee,
         on_delete=models.CASCADE,
+        unique=True,
     )
     library = models.ForeignKey(
         Library,
         on_delete=models.CASCADE,
     )
     date_joined = models.DateField(auto_now_add=True)
+    duration = models.CharField(
+        max_length=125,
+        choices=MembershipDuration.choices,
+        default=MembershipDuration.ONE_MONTH,
+    )
+
+    def expiry_date(self):
+        self.expiry_date = self.date_joined + datetime.timedelta(days=int(self.duration))
+        return self.expiry_date
 
     def __str__(self):
         return f"{self.employee.id} - {self.employee.get_full_name()} - {self.employee.company}"
 
+
+
+
+
+
+
+
+
+
+
+    # membership_expiry = models.DateField(null=True, editable=False)
+
+    # def save(self, *args, **kwargs):
+    #     if self.membership_expiry is None:
+    #         self.membership_expiry = self.date_joined.date() + datetime.timedelta(days=30)
+    #     super(EmployeeMembership, self).save(*args, **kwargs)

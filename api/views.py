@@ -10,13 +10,15 @@ from App.models import (
       Book, 
       Company, 
       Employee, 
-      Library
+      Library,
+      EmployeeMembership,
 )
 from .serializers import (
       BookSerializer, 
       EmployeeSerializer, 
       CompanySerializer, 
-      LibrarySerializer
+      LibrarySerializer,
+      EmployeeMembershipSerializer,
 )
 
 
@@ -81,6 +83,19 @@ class BookViewSet(viewsets.ModelViewSet):
     ]
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class MembershipViewSet(viewsets.ModelViewSet):
+    """
+    BookViewSet
+    """
+
+    filter_backends = [
+        DjangoFilterBackend,
+    ]
+    queryset = EmployeeMembership.objects.all()
+    serializer_class = EmployeeMembershipSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 

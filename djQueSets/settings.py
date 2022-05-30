@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +27,9 @@ INSTALLED_APPS = [
     'import_export',
     'rest_framework',
     'rest_framework.authtoken',
+    "admin_interface",
+    "colorfield",
+    'rangefilter',
 ]
 
 MIDDLEWARE = [
@@ -113,3 +117,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = ["127.0.0.1",]
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
+SILENCED_SYSTEM_CHECKS = ["security.W019"]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')

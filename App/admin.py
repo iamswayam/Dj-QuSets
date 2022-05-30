@@ -1,5 +1,8 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
+from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
+import datetime
+
 
 from .models import (
     Book, 
@@ -44,15 +47,25 @@ class EmployeeMembershipAdmin(admin.ModelAdmin):
     list_display = [
         "date_joined",
         "_employee_",
+        "company",
+        "expiry_date",
     ]
     search_fields = [
-        "id",
         "_employee_",
+        "company__name",
+    ]
+    list_filter = [
+        (
+        "date_joined", 
+        DateRangeFilter
+        ),
     ]
 
-    @admin.display(ordering='employee__get_full_name')
     def _employee_(self, obj):
         return f"{obj.employee.fName} {obj.employee.mName} {obj.employee.lName}"
+
+    def company(self, obj):
+        return obj.employee.company
 
 
 @admin.register(Book)
@@ -73,9 +86,27 @@ class BookAdmin(admin.ModelAdmin):
         "author",
     )
 
+
+@admin.register(Library)
+class LibraryAdmin(admin.ModelAdmin):
+
+    ordering=['id']
+    list_display = [
+        "id",
+        "name",
+        "books",
+    ]
+    search_fields = [
+        "name",
+        "book__name",
+    ]
+
+    @admin.display(ordering='book__name')
+    def books(self, obj):
+        return obj.get_books_with_author()
+
 @admin.register(
     Company,
-    Library,
     Author,
 )
 

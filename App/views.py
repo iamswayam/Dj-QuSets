@@ -1,10 +1,35 @@
 from django.shortcuts import render
-from .models import Book, Company, Employee, Library
+from .models import Book, Company, Employee, Library, EmployeeMembership
 from django.db.models import Prefetch   
 
 # print(Employee.objects.all())
 
+def home(request):
+    employees = Employee.objects.select_related().order_by("id")
 
+    e1 = Employee.objects.values()
+    e2 = Employee.objects.values_list()
+    e3 = Library.objects.prefetch_related("book")
+
+    print("VALUES:", e1)
+    print("VALUES_LIST:", e2)
+    print("PREFETCH:", e3)
+
+    books = Book.objects.select_related().all()
+    membership = EmployeeMembership.objects.select_related().all().order_by("date_joined")
+    print("OUTPUT:", employees.query)
+    context = {
+        "employees": employees, 
+        "books": books,
+        "membership": membership,
+    }
+    return render(request, 'home.html', context)
+
+def home2(request):
+    books = Book.objects.select_related().all()
+    return render(request, 'home.html', {"books": books})
+    
+"""
 def home(request):
     # employees = Employee.objects.all().prefetch_related('library_set')
     employees = Employee.objects.all().filter(company__name="Infosys")
@@ -41,3 +66,4 @@ def home2(request):
 #     for employee in employees:
 #         print(employee.library_set.all())
 #     return None
+"""
