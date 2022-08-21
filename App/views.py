@@ -5,21 +5,25 @@ from django.db.models import Prefetch
 # print(Employee.objects.all())
 
 def home(request):
-    employees = Employee.objects.select_related().order_by("id")
+    
 
-    e1 = Employee.objects.values()
-    e2 = Employee.objects.values_list()
-    e3 = Library.objects.prefetch_related("book")
+    # e1 = Employee.objects.values()
+    # e2 = Employee.objects.values_list()
+    # e3 = Library.objects.prefetch_related("book")
 
-    print("VALUES:", e1)
-    print("VALUES_LIST:", e2)
-    print("PREFETCH:", e3)
+    # print("VALUES:", e1)
+    # print("VALUES_LIST:", e2)
+    # print("PREFETCH:", e3)
+    ok = Employee.objects.raw('SELECT * FROM "App_employee" ORDER BY "App_employee"."id" ASC')
+    for i in ok:
+        print("XXXXXX:", i)
 
+    employees = Employee.objects.select_related().order_by("fName")
     books = Book.objects.select_related().all()
     membership = EmployeeMembership.objects.select_related().all().order_by("date_joined")
     print("OUTPUT:", employees.query)
     context = {
-        "employees": employees, 
+        "employees": employees,
         "books": books,
         "membership": membership,
     }
