@@ -1,4 +1,4 @@
-from App.models import Author, Book, Company, Employee, Library
+from App.models import Author, Book, Company, Employee, EmployeeMembership, Library
 from rest_framework import serializers
 from drf_writable_nested import WritableNestedModelSerializer
 
@@ -6,18 +6,6 @@ from drf_writable_nested import WritableNestedModelSerializer
 class BaseSerailizer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     name = serializers.CharField(read_only=True)
-
-
-class AuthorSerializer(BaseSerailizer):
-    """
-    AuthorSerializer
-    """
-
-    class Meta:
-        model= Author
-        fields = [
-          "name"
-        ]
 
 
 class BookSerializer(BaseSerailizer):
@@ -29,8 +17,23 @@ class BookSerializer(BaseSerailizer):
     class Meta:
         model= Book
         fields = [
+          "id",
           "name",
           "author"
+        ]
+
+class AuthorSerializer(BaseSerailizer):
+    """
+    AuthorSerializer
+    """
+    books = BookSerializer(many=True, source="book_set")
+
+    class Meta:
+        model= Author
+        fields = [
+          "id",
+          "name",
+          "books",
         ]
 
     # def create(self, validated_data):
@@ -55,20 +58,46 @@ class EmployeeNameSerializer(BaseSerailizer):
         ]
 
 
+class EmployeeMembershipSerializer(BaseSerailizer):
+    """
+    EmployeeMembership
+    """
+    employee = serializers.CharField()
+    validity = serializers.DateField(source="expiry_date", read_only=True)
+
+    class Meta:
+        model= EmployeeMembership
+        fields = [
+          "employee", 
+          "validity",
+        ]
+
+
 class LibrarySerializer(BaseSerailizer):
     """
-    CompanySerializer
+    LibrarySerializer
     """
     books = BookSerializer(source="book", many=True)
-    employees = EmployeeNameSerializer(many=True)
+    membership = EmployeeMembershipSerializer(many=True, source="employeemembership_set")
+
 
     class Meta:
         model= Library
         fields = [
           "name",
           "books",
-          "employees",
+          "membership",
         ]
+
+    # def get_membership(self, obj):
+    #   return EmployeeMembershipSerializer(obj.membership.all(), many=True).data
+
+    # def create(self, validated_data):
+    #     member_data = validated_data.pop('membership')
+    #     outcome = Library.objects.create(**validated_data)
+    #     for data in member_data:
+    #         EmployeeMembership.objects.create(outcome=outcome, **data)
+    #     return outcome
 
 
 class EmployeeSerializer(WritableNestedModelSerializer, BaseSerailizer):
@@ -80,8 +109,8 @@ class EmployeeSerializer(WritableNestedModelSerializer, BaseSerailizer):
     last_name = serializers.CharField(source="lName", allow_blank=True)
     age = serializers.IntegerField()
     company = serializers.CharField()
-    library = LibrarySerializer(many=True)
-    membership = serializers.BooleanField()
+    membership_validity = serializers.DateField(source="employeemembership.expiry_date")
+
 
     class Meta:
         model= Employee
@@ -92,9 +121,15 @@ class EmployeeSerializer(WritableNestedModelSerializer, BaseSerailizer):
           "last_name",
           "age",
           "company",
-          "library",
-          "membership",
+          "membership_validity",
         ]
+
+    # def create(self, validated_data):
+    #     member_data = validated_data.pop('membership')
+    #     outcome = Library.objects.create(**validated_data)
+    #     for data in member_data:
+    #         EmployeeMembership.objects.create(outcome=outcome, **data)
+    #     return outcome
 
 
 class CompanySerializer(BaseSerailizer):
@@ -111,19 +146,7 @@ class CompanySerializer(BaseSerailizer):
         ]
 
 
-class EmployeeMembershipSerializer(BaseSerailizer):
-    """
-    CompanySerializer
-    """
-    employee = serializers.CharField()
-    validity = serializers.DateField(source="expiry_date", read_only=True)
 
-    class Meta:
-        model= Company
-        fields = [
-          "employee", 
-          "validity",
-        ]
 
 
 

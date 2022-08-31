@@ -5,7 +5,6 @@ from django.db.models import Prefetch
 # print(Employee.objects.all())
 
 def home(request):
-    
 
     # e1 = Employee.objects.values()
     # e2 = Employee.objects.values_list()
@@ -29,10 +28,19 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+
+
 def home2(request):
-    books = Book.objects.select_related().all()
+    books = Book.objects.select_related('author')
+    
+    # books = Book.objects.all()
+    for book in books: 
+        print(book.author.name) 
+    # print("OUTPUTTT:", books)
     return render(request, 'home.html', {"books": books})
     
+
+
 """
 def home(request):
     # employees = Employee.objects.all().prefetch_related('library_set')

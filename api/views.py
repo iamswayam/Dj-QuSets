@@ -11,6 +11,7 @@ from App.models import (
       Company, 
       Employee, 
       Library,
+      Author,
       EmployeeMembership,
 )
 from .serializers import (
@@ -19,6 +20,7 @@ from .serializers import (
       CompanySerializer, 
       LibrarySerializer,
       EmployeeMembershipSerializer,
+      AuthorSerializer,
 )
 
 
@@ -29,7 +31,11 @@ class apiHome(APIView):
         return Response(wc_msg, status=status.HTTP_200_OK)
 
 
-class EmployeeViewSet(viewsets.ReadOnlyModelViewSet, mixins.CreateModelMixin, mixins.DestroyModelMixin):
+class EmployeeViewSet(
+                viewsets.ReadOnlyModelViewSet, 
+                mixins.CreateModelMixin, 
+                mixins.DestroyModelMixin
+                ):
     """
     EmployeeViewSet
     """
@@ -37,6 +43,7 @@ class EmployeeViewSet(viewsets.ReadOnlyModelViewSet, mixins.CreateModelMixin, mi
     filter_backends = [
         DjangoFilterBackend,
     ]
+    filterset_fields = ['id', 'company']
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -99,13 +106,14 @@ class MembershipViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
+class AuthorViewSet(viewsets.ModelViewSet):
+    """
+    BookViewSet
+    """
 
-
-
-
-
-    # def get_queryset(self):
-    #     return self.queryset
-
-    # def get_queryset(self):
-    #     return self.request.user.accounts.all()
+    filter_backends = [
+        DjangoFilterBackend,
+    ]
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
